@@ -5,8 +5,15 @@
 using GenerativeQuote;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(o => o.AddDefaultPolicy(builder => {
+    builder.AllowAnyMethod();
+    builder.AllowAnyHeader();
+    builder.AllowAnyOrigin();
+}));
 var config = builder.Configuration;
 var app = builder.Build();
+
+app.UseCors();
 
 app.MapGet("/random-quote", (string prompt) => GetQuote(prompt));
 
