@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 var app = builder.Build();
 
-app.MapGet("/random-quote", (string text) => GetQuote(text));
+app.MapGet("/random-quote", (string prompt) => GetQuote(prompt));
 
 app.Run();
 
@@ -16,19 +16,27 @@ app.Run();
 /// Returns a random quote from a fictional person.
 /// </summary>
 /// <example>"Generate a random quote from a fictional person."</example>
-async Task<string> GetQuote(string text)
+async Task<string> GetQuote(string prompt)
 {
-    const string Prompt = @"Goal: Create a creative, pithy random quote from a fictious author.
-    
-    Few-Show Examples:
+    const string PromptTemplate = @"Goal: Create a creative, pithy random quote from a fictitious author.  Return this in JSON format and do not use markdown syntax.  Please do not include ```json.
+   
+        Few-Show Examples:
 
-    1. `If you never dream, you won't dream big` ~ Marty Rapinski
-    2. `Holding the world in your hands is fairly wet` ~ Isaac Fortis
-    3. `Where there's water, there's fish` ~ Theo Conway
+        [{
+            'quote': 'If you never dream, you won\'t dream big',
+            'author': 'Marty Rapinski'
+        },
+        {
+        'quote': 'Holding the world in your hands is fairly wet',
+        'author': 'Isaac Fortis'
+        },
+        {
+        'quote': 'Where there\'s water, there's fish',
+        'author': 'Theo Conway'
+        }]
 
-    Use the following text as the theme to generate a quote for: 
-    ";
-
+        Use the following text as the theme to generate a quote for: ";
+ 
     string projectId = config["projectId"];
 
     if (string.IsNullOrEmpty(projectId))
@@ -36,7 +44,7 @@ async Task<string> GetQuote(string text)
 
     VertexAIModelGenerator model = new VertexAIModelGenerator(projectId: projectId);
 
-    var result = await model.GenerateTextAsync(Prompt + text);
+    var result = await model.GenerateTextAsync(PromptTemplate + prompt);
 
     return result.ToText();
 }

@@ -48,7 +48,7 @@ public class VertexAIModelGenerator
             generation_config = new
             {
                 maxOutputTokens = 2048,
-                temperature = 0.1,
+                temperature = 0.6,
                 topP = 1,
                 topK = 32
             }
