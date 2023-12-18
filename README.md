@@ -69,4 +69,18 @@ The code to get the required access token is in the `GetAccessTokenAsync()` meth
 
 As an added bonus you can use [Duet AI assistance](https://cloud.google.com/code/docs/vscode/write-code-duet-ai) with Google's [Cloud Code Extension](https://cloud.google.com/code/docs/vscode/install#install) for VS Code.
 
+## Running
 
+### Locally
+
+To run locally ensure you have the [dotnet cli](https://dotnet.microsoft.com/en-us/download) installed. Configure [appsettings.json](appsettings.json) with your project and then run the app:
+
+```sh
+dotnet run
+```
+
+You can then use curl to generate quotes:
+
+```sh
+curl 'http://localhost:5000/random-quote?prompt=Winston+Churchill'
+```
