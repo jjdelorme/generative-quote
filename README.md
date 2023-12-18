@@ -82,5 +82,5 @@ dotnet run
 You can then use curl to generate quotes:
 
 ```sh
-curl 'http://localhost:5000/random-quote?prompt=Winston+Churchill'
+curl 'http://localhost:5000/random-quote?prompt=waterfalls'
 ```
