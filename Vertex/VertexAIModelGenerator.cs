@@ -32,27 +32,7 @@ public class VertexAIModelGenerator
         
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
 
-        var requestBody = new
-        {
-            contents = new List<object>()
-            {
-                new
-                {
-                    role = "user",
-                    parts = new List<object>()
-                    {
-                        new { text = textPrompt }
-                    }
-                }
-            },
-            generation_config = new
-            {
-                maxOutputTokens = 2048,
-                temperature = 0.6,
-                topP = 1,
-                topK = 32
-            }
-        };
+        var requestBody = GenerateContentRequest.FromPrompt(textPrompt);
 
         // Create a JSON string from the requestBody
         var content = JsonContent.Create(requestBody);
