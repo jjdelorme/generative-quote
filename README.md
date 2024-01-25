@@ -75,7 +75,7 @@ To run through this exercise, sync to the `demo-start` git tag: `git checkout de
 
 ### Prompts
 
-The following prompts were used to generate the .NET wrapper:
+The following prompts were used to generate the .NET wrapper which is available in `./Vertex/GenerateContentRequest.cs`.
 
 1. Highlight the creation of `requestBody` with your cursor and then enter the following prompt in Duet AI Chat:
 
