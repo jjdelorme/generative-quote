@@ -65,9 +65,41 @@ The code to get the required access token is in the `GetAccessTokenAsync()` meth
     }
 ```
 
-### BONUS: Use Duet to help generate the .NET Wrapper
+## Use Duet to help generate the .NET Wrapper
 
-As an added bonus you can use [Duet AI assistance](https://cloud.google.com/code/docs/vscode/write-code-duet-ai) with Google's [Cloud Code Extension](https://cloud.google.com/code/docs/vscode/install#install) for VS Code.
+Use [Duet AI assistance](https://cloud.google.com/code/docs/vscode/write-code-duet-ai) with Google's [Cloud Code Extension](https://cloud.google.com/code/docs/vscode/install#install) for VS Code to help generate the .NET wrapper.  
+
+To run through this exercise, sync to the `demo-start` git tag: `git checkout demo-start` and then follow along with the prompts below.
+
+![duet ai assistant](duet-screenshot.png)
+
+### Prompts
+
+The following prompts were used to generate the .NET wrapper:
+
+1. Highlight the creation of `requestBody` with your cursor and then enter the following prompt in Duet AI Chat:
+
+    ```
+    The highlighted text represents an anonymous record object with default properties, except the textPrompt value that is passed in. Can you create a strongly typed class called GenerateContentRequest that represents these properties?
+    ```
+
+1. My response was pretty good, but I wanted to provide defaults for the properties. Try now adding the following prompt:
+
+    ```
+    Can you please update the code with default values for these properties based on the values shown in VertexAIModelGenerator.cs
+    ```
+
+1. If your output was similar to mine, we should now have a fully capable Response object.  However, this object is still a bit cumbersome to work with when all I really want to provide as a consumer of this API is the user's prompt.  Let's try this prompt:
+
+    ```
+    Can you create a convenience method to create an instance of GenerateContentRequest with a single string value for Text?
+    ```
+
+With this, you should now be able to create the request object simply like this:
+
+```C#
+var requestBody = GenerateContentRequest.FromPrompt(textPrompt);
+```
 
 ## Running
 
