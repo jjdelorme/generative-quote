@@ -39,8 +39,8 @@ public class TextSegment
 
 public class GenerationConfig
 {
-    public int MaxOutputTokens { get; set; } = 2048;
+    public int MaxOutputTokens { get; set; } = 256;
     public double Temperature { get; set; } = 0.6;
     public double TopP { get; set; } = 1;
-    public int TopK { get; set; } = 32;
+//    public int TopK { get; set; } = 32;
 }
