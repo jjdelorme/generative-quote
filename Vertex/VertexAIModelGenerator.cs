@@ -5,17 +5,20 @@ namespace GenerativeQuote;
 
 public class VertexAIModelGenerator
 {
+    private readonly HttpClient _httpClient;
     private readonly string _apiEndpoint;
     private readonly string _projectId;
     private readonly string _modelId;
     private readonly string _locationId;
 
     public VertexAIModelGenerator(
+        HttpClient httpClient, 
         string projectId, 
-        string modelId = "gemini-pro-vision", 
+        string modelId = "gemini-1.0-pro-001", 
         string apiEndpoint = "us-central1-aiplatform.googleapis.com",         
         string locationId = "us-central1")
     {
+        _httpClient = httpClient;
         _apiEndpoint = apiEndpoint;
         _projectId = projectId;
         _modelId = modelId;
@@ -24,13 +27,11 @@ public class VertexAIModelGenerator
 
     public async Task<List<GenerateContentResponse>> GenerateTextAsync(string textPrompt)
     {
-        using var client = new HttpClient();
-
         var url = $"https://{_apiEndpoint}/v1beta1/projects/{_projectId}/locations/{_locationId}/publishers/google/models/{_modelId}:streamGenerateContent";
 
         var accessToken = await GetAccessTokenAsync();
         
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
 
         var requestBody = GenerateContentRequest.FromPrompt(textPrompt);
 
@@ -38,7 +39,7 @@ public class VertexAIModelGenerator
         var content = JsonContent.Create(requestBody);
 
         // Make the request
-        var response = await client.PostAsync(url, content);
+        var response = await _httpClient.PostAsync(url, content);
 
         // Check for errors
         if (!response.IsSuccessStatusCode)

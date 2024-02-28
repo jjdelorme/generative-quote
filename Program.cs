@@ -3,6 +3,7 @@
 /// </summary>
 
 using GenerativeQuote;
+using Google.Cloud.Logging.Console;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(o => o.AddDefaultPolicy(builder => {
@@ -10,12 +11,42 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(builder => {
     builder.AllowAnyHeader();
     builder.AllowAnyOrigin();
 }));
+builder.Services.AddHttpClient();
+
+if (builder.Environment.IsProduction())
+{
+    // When running in production (Cloud Run) add Google logging formatter.
+    builder.Logging.AddGoogleCloudConsole();
+}
+
 var config = builder.Configuration;
 var app = builder.Build();
 
+var log = app.Logger;
+
 app.UseCors();
 
-app.MapGet("/random-quote", (string prompt) => GetQuote(prompt));
+app.MapGet("/random-quote", async (string prompt) => 
+{
+    try
+    {
+        var result = await GetQuote(prompt);
+        if (result == null)
+        {
+            return Results.NotFound("No response from Vertex Search");
+        }
+        else
+        {
+            return Results.Ok(result);
+        }
+    }
+    catch (Exception error)
+    {
+        log.LogError("An error occurred while generating a random quote for prompt: {0},\n{1}", 
+            error.Message, error.StackTrace);
+        return Results.Problem(detail: error.StackTrace, title: error.Message, statusCode: 500);
+    }
+});
 
 app.Run();
 
@@ -49,7 +80,9 @@ async Task<string> GetQuote(string prompt)
     if (string.IsNullOrEmpty(projectId))
         throw new Exception("Missing configuration variable: projectId");
 
-    VertexAIModelGenerator model = new VertexAIModelGenerator(projectId: projectId);
+    var httpClient = app.Services.GetRequiredService<HttpClient>();
+
+    VertexAIModelGenerator model = new VertexAIModelGenerator(httpClient, projectId: projectId);
 
     var result = await model.GenerateTextAsync(PromptTemplate + prompt);
 

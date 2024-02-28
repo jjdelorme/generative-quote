@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="google.apis.auth" Version="1.64.0" />
+    <PackageReference Include="Google.Cloud.Logging.Console" Version="1.2.0" />
   </ItemGroup>
 
 </Project>
