@@ -103,6 +103,12 @@ var requestBody = GenerateContentRequest.FromPrompt(textPrompt);
 
 ## Running
 
+### Deploying to Cloud Run
+To deploy to Cloud Run from source, which will build a container for you:
+```sh
+gcloud run deploy generative-quote --source . --set-env-vars ASPNETCORE_HTTP_PORTS=8080
+```
+
 ### Locally
 
 To run locally ensure you have the [dotnet cli](https://dotnet.microsoft.com/en-us/download) installed. Configure [appsettings.json](appsettings.json) with your project and then run the app:
