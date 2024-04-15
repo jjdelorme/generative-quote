@@ -6,7 +6,6 @@ public class VertexAIModelGenerator
 {
     private readonly string _apiEndpoint;
     private readonly string _model;
-    private readonly GenerationConfig _generationConfig;
 
     public VertexAIModelGenerator(
         string projectId, 
