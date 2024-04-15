@@ -45,3 +45,14 @@ curl 'http://localhost:5000/random-quote?prompt=waterfalls'
 ## End to End
 
 Who doesn't love a CLI? Ok, but if you want a nice little Angular application to display these quotes see [this](e2e.md).
+
+
+## Google SDK Reference
+
+There are some [samples in C#](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/send-chat-prompts-gemini#gemini-chat-samples-csharp) which demonstrate calling the Gemini Vertex API.  This code uses the [PredictionServiceClient](https://cloud.google.com/dotnet/docs/reference/Google.Cloud.AIPlatform.V1/latest/Google.Cloud.AIPlatform.V1.PredictionServiceClient) API.  
+
+Use the SDK in your project by running the following command:
+
+```bash
+dotnet add package Google.Cloud.AIPlatform.V1
+```
