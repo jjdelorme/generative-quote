@@ -1,5 +1,5 @@
-using System.Text.Json;
-using Google.Apis.Auth.OAuth2;
+using Google.Api.Gax.Grpc;
+using Google.Cloud.AIPlatform.V1;
 
 namespace GenerativeQuote;
 
@@ -10,65 +10,53 @@ public class VertexAIModelGenerator
     private readonly string _projectId;
     private readonly string _modelId;
     private readonly string _locationId;
+    private readonly string _model;
+    private readonly GenerationConfig _generationConfig;
 
     public VertexAIModelGenerator(
-        HttpClient httpClient, 
         string projectId, 
         string modelId = "gemini-1.0-pro-001", 
         string apiEndpoint = "us-central1-aiplatform.googleapis.com",         
         string locationId = "us-central1")
     {
-        _httpClient = httpClient;
-        _apiEndpoint = apiEndpoint;
         _projectId = projectId;
         _modelId = modelId;
         _locationId = locationId;
+        _apiEndpoint = $"{_locationId}-aiplatform.googleapis.com";
+
+        // `projects/{project}/locations/{location}/publishers/*/models/*`
+        _model = $"projects/{_projectId}/locations/{_locationId}/publishers/google/models/{_modelId}";
+
+        _generationConfig = new GenerationConfig() 
+        { 
+            CandidateCount = 1, 
+            MaxOutputTokens = 256, 
+            Temperature = 0.6f, 
+            TopP = 1
+        };
     }
 
-    public async Task<List<GenerateContentResponse>> GenerateTextAsync(string textPrompt)
+    public async Task<string> GenerateTextAsync(string textPrompt)
     {
-        var url = $"https://{_apiEndpoint}/v1beta1/projects/{_projectId}/locations/{_locationId}/publishers/google/models/{_modelId}:streamGenerateContent";
-
-        var accessToken = await GetAccessTokenAsync();
-        
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-
-        var requestBody = GenerateContentRequest.FromPrompt(textPrompt);
-
-        // Create a JSON string from the requestBody
-        var content = JsonContent.Create(requestBody);
-
-        // Make the request
-        var response = await _httpClient.PostAsync(url, content);
-
-        // Check for errors
-        if (!response.IsSuccessStatusCode)
+        // Create a prediction service client.
+        var predictionServiceClient = new PredictionServiceClientBuilder
         {
-            throw new Exception($"Error generating content: {response.StatusCode}");
-        }
+            Endpoint = _apiEndpoint
+        }.Build();
+
+        var content = new Content() { Role = "USER" };
+        content.Parts.Add(new Part() { Text = textPrompt });
+
+        GenerateContentRequest request = new GenerateContentRequest
+        {
+            Contents = { content, },
+            GenerationConfig = _generationConfig,
+            Model = _model,
+        };
         
-        var result = await JsonSerializer.DeserializeAsync<List<GenerateContentResponse>>(
-            response.Content.ReadAsStream(), 
-            options: new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }
-        );
-        
-        return result;
-    }
+        var response = await predictionServiceClient.GenerateContentAsync(request);
+        var text = response.Candidates.First().Content.Parts.First().Text;
 
-    private async Task<string> GetAccessTokenAsync()
-    {
-        // Use Application Default Credentials
-        var credential = await GoogleCredential.GetApplicationDefaultAsync();
-
-        // Create credential scoped to GCP APIs
-        var scoped = credential.CreateScoped(
-            new[] { "https://www.googleapis.com/auth/cloud-platform" });
-
-        var accessToken = await scoped.UnderlyingCredential.GetAccessTokenForRequestAsync();
-
-        return accessToken;
+        return text;
     }
 }
