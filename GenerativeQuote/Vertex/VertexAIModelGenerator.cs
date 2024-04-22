@@ -12,7 +12,6 @@ public class VertexAIModelGenerator
         string modelId = "gemini-1.0-pro-001", 
         string locationId = "us-central1")
     {
-        // `projects/{project}/locations/{location}/publishers/*/models/*`
         _model = $"projects/{projectId}/locations/{locationId}/publishers/google/models/{modelId}";
         
         _apiEndpoint = $"{locationId}-aiplatform.googleapis.com";
@@ -50,7 +49,7 @@ public class VertexAIModelGenerator
             Endpoint = _apiEndpoint
         }.Build();
 
-        var response = await predictionServiceClient.GenerateContentAsync(request);
+        GenerateContentResponse response = await predictionServiceClient.GenerateContentAsync(request);
         var text = response.Candidates.First().Content.Parts.First().Text;
 
         return text;

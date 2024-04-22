@@ -80,8 +80,6 @@ async Task<string> GetQuote(string prompt)
     if (string.IsNullOrEmpty(projectId))
         throw new Exception("Missing configuration variable: projectId");
 
-    // var httpClient = app.Services.GetRequiredService<HttpClient>();
-
     var model = new VertexAIModelGenerator(projectId: projectId);
 
     var result = await model.GenerateTextAsync(PromptTemplate + prompt);

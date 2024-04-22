@@ -4,7 +4,7 @@ This sample application is written using the .NET 8 minimal Web API to demonstra
 
 Using **Vertex AI Studio** in the Google Cloud Consle you can easily design and test prompts.  You can also quickly generate code using the **<> GET CODE** button in the upper right.
 
-![alt text for image](vertex-screenshot.png)
+![alt text for image](assets/vertex-screenshot.png)
 
 ## Prerequisites
 
@@ -44,7 +44,7 @@ curl 'http://localhost:5000/random-quote?prompt=waterfalls'
 
 ## End to End
 
-Who doesn't love a CLI? Ok, but if you want a nice little Angular application to display these quotes see [this](e2e.md).
+Who doesn't love a CLI? Ok, but if you want a nice little Angular application to display these quotes see [this](/assets/e2e.md).
 
 
 ## Google SDK Reference
