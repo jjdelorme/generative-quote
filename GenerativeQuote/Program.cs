@@ -11,7 +11,7 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(builder => {
     builder.AllowAnyHeader();
     builder.AllowAnyOrigin();
 }));
-builder.Services.AddHttpClient();
+
 builder.Services.Configure<QuoteGeneratorOptions>(
     builder.Configuration.GetSection(QuoteGeneratorOptions.QuoteGenerator));
 builder.Services.AddSingleton<QuoteGenerator>();
