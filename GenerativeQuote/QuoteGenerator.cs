@@ -12,6 +12,9 @@ public class QuoteGenerator
     public QuoteGenerator(IOptions<QuoteGeneratorOptions> options)
     {
         _options = options.Value;
+        
+        if (string.IsNullOrEmpty(_options.ProjectId))
+            throw new Exception("Missing configuration variable: projectId");
 
         _model = $"projects/{_options.ProjectId}/locations/{_options.LocationId}/publishers/google/models/{_options.ModelId}";
         
@@ -42,9 +45,6 @@ public class QuoteGenerator
             }]
 
             Use the following text as the theme to generate a quote for: ";
-
-        if (string.IsNullOrEmpty(_options.ProjectId))
-            throw new Exception("Missing configuration variable: projectId");
 
         var result = await GenerateTextAsync(PromptTemplate + prompt);
 
