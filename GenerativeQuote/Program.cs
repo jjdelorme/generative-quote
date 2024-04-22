@@ -11,7 +11,11 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(builder => {
     builder.AllowAnyHeader();
     builder.AllowAnyOrigin();
 }));
-builder.Services.AddHttpClient();
+
+builder.Services.AddSingleton<QuoteGenerator>(sp => {
+    var config = sp.GetRequiredService<IConfiguration>();
+    return new QuoteGenerator(config["projectId"]);
+});
 
 if (builder.Environment.IsProduction())
 {
@@ -26,11 +30,12 @@ var log = app.Logger;
 
 app.UseCors();
 
-app.MapGet("/random-quote", async (string prompt) => 
+app.MapGet("/random-quote", async (QuoteGenerator generator, string prompt) => 
 {
     try
     {
-        var result = await GetQuote(prompt);
+        var result = await generator.GetQuote(prompt);
+        
         if (result == null)
         {
             return Results.NotFound("No response from Vertex Search");
@@ -49,40 +54,3 @@ app.MapGet("/random-quote", async (string prompt) =>
 });
 
 app.Run();
-
-/// <summary>
-/// Returns a random quote from a fictional person.
-/// </summary>
-/// <example>"Generate a random quote from a fictional person."</example>
-async Task<string> GetQuote(string prompt)
-{
-    const string PromptTemplate = @"Goal: Create a creative, pithy random quote from a fictitious author.  Return this in JSON format and do not use markdown syntax.  Please do not include ```json.
-   
-        Few-Show Examples:
-
-        [{
-            'quote': 'If you never dream, you won\'t dream big',
-            'author': 'Marty Rapinski'
-        },
-        {
-        'quote': 'Holding the world in your hands is fairly wet',
-        'author': 'Isaac Fortis'
-        },
-        {
-        'quote': 'Where there\'s water, there's fish',
-        'author': 'Theo Conway'
-        }]
-
-        Use the following text as the theme to generate a quote for: ";
- 
-    string projectId = config["projectId"];
-
-    if (string.IsNullOrEmpty(projectId))
-        throw new Exception("Missing configuration variable: projectId");
-
-    var model = new VertexAIModelGenerator(projectId: projectId);
-
-    var result = await model.GenerateTextAsync(PromptTemplate + prompt);
-
-    return result;
-}
