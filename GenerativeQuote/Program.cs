@@ -16,8 +16,7 @@ builder.Services.Configure<QuoteGeneratorOptions>(
     builder.Configuration.GetSection(QuoteGeneratorOptions.QuoteGenerator));
 
 builder.Services.AddPredictionServiceClient(client => {
-    var options = builder.Configuration.GetSection(QuoteGeneratorOptions.QuoteGenerator)
-        .Get<QuoteGeneratorOptions>();
+    var options = QuoteGeneratorOptions.FromConfiguration(builder.Configuration);
     client.Endpoint = $"{options.LocationId}-aiplatform.googleapis.com";
 });
 
