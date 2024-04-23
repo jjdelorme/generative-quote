@@ -7,9 +7,10 @@ public class QuoteGenerator
 {
     private readonly QuoteGeneratorOptions _options;
     private readonly string _model;
-    private readonly string _apiEndpoint;
+    private readonly PredictionServiceClient _predictionServiceClient;
 
-    public QuoteGenerator(IOptions<QuoteGeneratorOptions> options)
+    public QuoteGenerator(IOptions<QuoteGeneratorOptions> options, 
+        PredictionServiceClient predictionServiceClient)
     {
         _options = options.Value;
         
@@ -18,7 +19,8 @@ public class QuoteGenerator
 
         _model = $"projects/{_options.ProjectId}/locations/{_options.LocationId}/publishers/google/models/{_options.ModelId}";
         
-        _apiEndpoint = $"{_options.LocationId}-aiplatform.googleapis.com";
+        _predictionServiceClient = predictionServiceClient;
+
     }
 
     /// <summary>
@@ -77,13 +79,7 @@ public class QuoteGenerator
             Model = _model,
         };
 
-        // Create a prediction service client.
-        var predictionServiceClient = new PredictionServiceClientBuilder
-        {
-            Endpoint = _apiEndpoint
-        }.Build();
-
-        GenerateContentResponse response = await predictionServiceClient.GenerateContentAsync(request);
+        var response = await _predictionServiceClient.GenerateContentAsync(request);
         var text = response.Candidates.First().Content.Parts.First().Text;
 
         return text;

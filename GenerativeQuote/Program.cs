@@ -14,6 +14,13 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(builder => {
 
 builder.Services.Configure<QuoteGeneratorOptions>(
     builder.Configuration.GetSection(QuoteGeneratorOptions.QuoteGenerator));
+
+builder.Services.AddPredictionServiceClient(client => {
+    var options = builder.Configuration.GetSection(QuoteGeneratorOptions.QuoteGenerator)
+        .Get<QuoteGeneratorOptions>();
+    client.Endpoint = $"{options.LocationId}-aiplatform.googleapis.com";
+});
+
 builder.Services.AddSingleton<QuoteGenerator>();
 
 if (builder.Environment.IsProduction())
