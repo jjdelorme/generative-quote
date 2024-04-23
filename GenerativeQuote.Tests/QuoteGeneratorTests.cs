@@ -1,8 +1,6 @@
 using Google.Cloud.AIPlatform.V1;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace GenerativeQuote.Tests;
 
@@ -19,22 +17,49 @@ public class QuoteGeneratorTests
             ModelId = "my-model"
         };
 
-        var mockOptions = new Mock<IOptions<QuoteGeneratorOptions>>();
-        mockOptions.Setup(o => o.Value).Returns(options);
-
         var mockPredictionServiceClient = new Mock<PredictionServiceClient>();
-        mockPredictionServiceClient.Setup(c => c.GenerateContentAsync(It.IsAny<GenerateContentRequest>(), null))
+        mockPredictionServiceClient
+            .Setup(x => x.GenerateContentAsync(It.IsAny<GenerateContentRequest>(), null))
             .ReturnsAsync(new GenerateContentResponse
             {
-                Candidates = { new Candidate { Content = new Content { Parts = { new Part { Text = "Hello, world!" } } } } }
+                Candidates =
+                {
+                    new Candidate
+                    {
+                        Content = new Content
+                        {
+                            Parts =
+                            {
+                                new Part { Text = "{\"quote\": \"Hello, world!\", \"author\": \"John Doe\"}" }
+                            }
+                        }
+                    }
+                }
             });
 
-        var quoteGenerator = new QuoteGenerator(mockOptions.Object, mockPredictionServiceClient.Object);
+        var quoteGenerator = new QuoteGenerator(Options.Create(options), mockPredictionServiceClient.Object);
 
         // Act
-        var quote = await quoteGenerator.GetQuote("What is the meaning of life?");
+        var quote = await quoteGenerator.GetQuote("Hello, world!");
 
         // Assert
-        Assert.Equal("Hello, world!", quote);
+        Assert.Equal("Hello, world!", quote.Quote);
+        Assert.Equal("John Doe", quote.Author);
+    }
+
+    [Fact]
+    public void GetQuote_ThrowsException_WhenProjectIdMissing()
+    {
+        // Arrange
+        var options = new QuoteGeneratorOptions
+        {
+            LocationId = "us-central1",
+            ModelId = "my-model"
+        };
+
+        var mockPredictionServiceClient = new Mock<PredictionServiceClient>();
+
+        // Act and Assert
+        Assert.Throws<Exception>(() => new QuoteGenerator(Options.Create(options), mockPredictionServiceClient.Object));
     }
 }

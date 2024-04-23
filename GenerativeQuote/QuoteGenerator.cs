@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Google.Cloud.AIPlatform.V1;
 using Microsoft.Extensions.Options;
 
@@ -27,7 +28,7 @@ public class QuoteGenerator
     /// Returns a random quote from a fictional person.
     /// </summary>
     /// <example>"Generate a random quote from a fictional person."</example>
-    public async Task<string> GetQuote(string prompt)
+    public async Task<QuoteModel> GetQuote(string prompt)
     {
         const string PromptTemplate = @"Goal: Create a creative, pithy random quote from a fictitious author.  Return this in JSON format and do not use markdown syntax.  Please do not include ```json.
     
@@ -42,7 +43,7 @@ public class QuoteGenerator
             'author': 'Isaac Fortis'
             },
             {
-            'quote': 'Where there\'s water, there's fish',
+            'quote': 'Where there's water, there's fish',
             'author': 'Theo Conway'
             }]
 
@@ -50,7 +51,10 @@ public class QuoteGenerator
 
         var result = await GenerateTextAsync(PromptTemplate + prompt);
 
-        return result;
+        var quoteModel = JsonSerializer.Deserialize<QuoteModel>(result, 
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        return quoteModel;
     }
 
     /// <summary>
