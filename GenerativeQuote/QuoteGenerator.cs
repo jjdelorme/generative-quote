@@ -1,23 +1,26 @@
 using Google.Cloud.AIPlatform.V1;
+using Microsoft.Extensions.Options;
 
 namespace GenerativeQuote;
 
 public class QuoteGenerator
 {
+    private readonly QuoteGeneratorOptions _options;
     private readonly string _model;
-    private readonly string _apiEndpoint;
+    private readonly PredictionServiceClient _predictionServiceClient;
 
-    public QuoteGenerator(
-        string projectId, 
-        string modelId = "gemini-1.0-pro-001", 
-        string locationId = "us-central1")
+    public QuoteGenerator(IOptions<QuoteGeneratorOptions> options, 
+        PredictionServiceClient predictionServiceClient)
     {
-        if (string.IsNullOrEmpty(projectId))
+        _options = options.Value;
+        
+        if (string.IsNullOrEmpty(_options.ProjectId))
             throw new Exception("Missing configuration variable: projectId");
 
-        _model = $"projects/{projectId}/locations/{locationId}/publishers/google/models/{modelId}";
+        _model = $"projects/{_options.ProjectId}/locations/{_options.LocationId}/publishers/google/models/{_options.ModelId}";
         
-        _apiEndpoint = $"{locationId}-aiplatform.googleapis.com";
+        _predictionServiceClient = predictionServiceClient;
+
     }
 
     /// <summary>
@@ -76,13 +79,7 @@ public class QuoteGenerator
             Model = _model,
         };
 
-        // Create a prediction service client.
-        var predictionServiceClient = new PredictionServiceClientBuilder
-        {
-            Endpoint = _apiEndpoint
-        }.Build();
-
-        GenerateContentResponse response = await predictionServiceClient.GenerateContentAsync(request);
+        var response = await _predictionServiceClient.GenerateContentAsync(request);
         var text = response.Candidates.First().Content.Parts.First().Text;
 
         return text;

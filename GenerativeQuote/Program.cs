@@ -12,10 +12,15 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(builder => {
     builder.AllowAnyOrigin();
 }));
 
-builder.Services.AddSingleton<QuoteGenerator>(sp => {
-    var config = sp.GetRequiredService<IConfiguration>();
-    return new QuoteGenerator(config["projectId"]);
+builder.Services.Configure<QuoteGeneratorOptions>(
+    builder.Configuration.GetSection(QuoteGeneratorOptions.QuoteGenerator));
+
+builder.Services.AddPredictionServiceClient(client => {
+    var options = QuoteGeneratorOptions.FromConfiguration(builder.Configuration);
+    client.Endpoint = $"{options.LocationId}-aiplatform.googleapis.com";
 });
+
+builder.Services.AddSingleton<QuoteGenerator>();
 
 if (builder.Environment.IsProduction())
 {
