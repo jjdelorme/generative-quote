@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Google.Cloud.AIPlatform.V1;
 using Microsoft.Extensions.Options;
 
@@ -31,7 +32,7 @@ public class QuoteGenerator
     {
         const string PromptTemplate = @"Goal: Create a creative, pithy random quote from a fictitious author.  Return this in JSON format and do not use markdown syntax.  Please do not include ```json.
     
-            Few-Show Examples:
+            Few-shot Examples:
 
             [{
                 'quote': 'If you never dream, you won\'t dream big',
