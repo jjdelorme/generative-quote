@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Google.Cloud.AIPlatform.V1;
 using Microsoft.Extensions.Options;
 using Moq;
+using Xunit;
 
 namespace GenerativeQuote.Tests;
 
@@ -14,7 +16,7 @@ public class QuoteGeneratorTests
         {
             ProjectId = "my-project",
             LocationId = "us-central1",
-            ModelId = "my-model"
+            ModelId = "text-bison-001"
         };
 
         var mockPredictionServiceClient = new Mock<PredictionServiceClient>();
@@ -22,19 +24,7 @@ public class QuoteGeneratorTests
             .Setup(x => x.GenerateContentAsync(It.IsAny<GenerateContentRequest>(), null))
             .ReturnsAsync(new GenerateContentResponse
             {
-                Candidates =
-                {
-                    new Candidate
-                    {
-                        Content = new Content
-                        {
-                            Parts =
-                            {
-                                new Part { Text = "{\"quote\": \"Hello, world!\", \"author\": \"John Doe\"}" }
-                            }
-                        }
-                    }
-                }
+                Candidates = { new Candidate { Content = new Content { Parts = { new Part { Text = "{\"quote\":\"Hello, world!\",\"author\":\"John Doe\"}" } } } } }
             });
 
         var quoteGenerator = new QuoteGenerator(Options.Create(options), mockPredictionServiceClient.Object);
@@ -54,7 +44,7 @@ public class QuoteGeneratorTests
         var options = new QuoteGeneratorOptions
         {
             LocationId = "us-central1",
-            ModelId = "my-model"
+            ModelId = "text-bison-001"
         };
 
         var mockPredictionServiceClient = new Mock<PredictionServiceClient>();
