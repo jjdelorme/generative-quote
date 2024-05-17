@@ -1,13 +1,13 @@
 # Generative AI .NET 8 Sample
 
-This sample application is written using the .NET 8 minimal Web API to demonstrate calling the Vertex [Generative AI API](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini?_ga=2.228338718.-220341458.1702671073) with the Gemini 1.5 Flash model and the latest [Google.Cloud.AIPlatform.V1](https://cloud.google.com/dotnet/docs/reference/Google.Cloud.AIPlatform.V1) SDK.  
+This .NET 8 minimal Web API generates random quotes using Google's Gemini 1.5 Flash large language model.  The app demonstrates calling Gemini using the [Vertex AI API](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini?_ga=2.228338718.-220341458.1702671073) using the latest [Google.Cloud.AIPlatform.V1](https://cloud.google.com/dotnet/docs/reference/Google.Cloud.AIPlatform.V1) .NET SDK package.  
 
 There are 3 branches in this sample to follow along:
 
 | Branch | Purpose |
 |---|---|
 | [main](https://github.com/jjdelorme/generative-quote) | Starting point for refactoring the app using Gemini Code Assist |
-| [unit-tests](https://github.com/jjdelorme/generative-quote/tree/unit-tests) | Adds unit tests generatd using Gemini Code Assist |
+| [unit-tests](https://github.com/jjdelorme/generative-quote/tree/unit-tests) | Adds unit tests generated using Gemini Code Assist |
 | [completed](https://github.com/jjdelorme/generative-quote/tree/completed) | Adds Gemini Code Assist generated Dockerfile and cloudbuild.yaml to deploy to Cloud Run |
 
 You can also grab the companion simple Angular [companion web app](https://github.com/jjdelorme/quotes-web).
