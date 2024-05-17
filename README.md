@@ -2,7 +2,7 @@
 
 This sample application is written using the .NET 8 minimal Web API to demonstrate calling the Vertex [Generative AI API](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini?_ga=2.228338718.-220341458.1702671073) with the Gemini 1.5 Flash model and the latest [Google.Cloud.AIPlatform.V1](https://cloud.google.com/dotnet/docs/reference/Google.Cloud.AIPlatform.V1) SDK.  
 
-There are 2 branches in this sample to follow along:
+There are 3 branches in this sample to follow along:
 
 | Branch | Purpose |
 |---|---|
