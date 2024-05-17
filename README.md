@@ -10,7 +10,7 @@ There are 3 branches in this sample to follow along:
 | [unit-tests](https://github.com/jjdelorme/generative-quote/tree/unit-tests) | Adds unit tests generated using Gemini Code Assist |
 | [completed](https://github.com/jjdelorme/generative-quote/tree/completed) | Adds Gemini Code Assist generated Dockerfile and cloudbuild.yaml to deploy to Cloud Run |
 
-You can also grab the companion simple Angular [companion web app](https://github.com/jjdelorme/quotes-web).
+You can also grab the simple Angular [companion web app](https://github.com/jjdelorme/quotes-web).
 
 ![alt text for image](assets/quotes-web.png)
 
@@ -30,12 +30,6 @@ You can find your project id in the GCP console under the [project settings](htt
 
 ## Running
 
-### Deploying to Cloud Run
-To deploy to Cloud Run from source, which will build a container for you:
-```sh
-gcloud run deploy generative-quote --source . --set-env-vars ASPNETCORE_HTTP_PORTS=8080
-```
-
 ### Locally
 
 To run locally ensure you have the [dotnet cli](https://dotnet.microsoft.com/en-us/download) installed. Configure [appsettings.json](appsettings.json) with your project and then run the app:
@@ -49,6 +43,10 @@ You can then use curl to generate quotes:
 ```sh
 curl 'http://localhost:5000/random-quote?prompt=waterfalls'
 ```
+
+### Deploying to Cloud Run
+See the [completed](https://github.com/jjdelorme/generative-quote/tree/completed) branch for a complete example of how to deploy to Cloud Run using a Dockerfile and Cloud Build.
+
 
 ## End to End
 
