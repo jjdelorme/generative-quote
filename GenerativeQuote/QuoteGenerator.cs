@@ -30,28 +30,20 @@ public class QuoteGenerator
     /// <example>"Generate a random quote from a fictional person."</example>
     public async Task<string> GetQuote(string prompt)
     {
-        const string PromptTemplate = @"Goal: Create a creative, pithy random quote from a fictitious author.  Return this in JSON format and do not use markdown syntax.  Please do not include ```json.
-    
-            Few-shot Examples:
-
-            [{
-                'quote': 'If you never dream, you won\'t dream big',
-                'author': 'Marty Rapinski'
-            },
+        const string PromptTemplate = @"Goal: Create a creative, pithy random quote from a fictitious author.  Use the following JSON schema:
             {
-            'quote': 'Holding the world in your hands is fairly wet',
-            'author': 'Isaac Fortis'
-            },
-            {
-            'quote': 'Where there\'s water, there's fish',
-            'author': 'Theo Conway'
-            }]
+                ""type"": ""object"",
+                ""properties"": {
+                    ""author"": { ""type"": ""string"" },
+                    ""quote"": { ""type"": ""string"" },
+                }
+            }
 
             Use the following text as the theme to generate a quote for: ";
 
-        var result = await GenerateTextAsync(PromptTemplate + prompt);
+        var response = await GenerateTextAsync(PromptTemplate + prompt);
 
-        return result;
+        return response;
     }
 
     /// <summary>
@@ -67,7 +59,8 @@ public class QuoteGenerator
             CandidateCount = 1, 
             MaxOutputTokens = 256, 
             Temperature = temperature, 
-            TopP = 1
+            TopP = 1,
+            ResponseMimeType = "application/json"
         };
 
         var content = new Content() { Role = "USER" };
