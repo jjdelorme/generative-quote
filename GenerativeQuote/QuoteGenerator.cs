@@ -8,10 +8,10 @@ public class QuoteGenerator
 {
     private readonly QuoteGeneratorOptions _options;
     private readonly string _model;
-    private readonly PredictionServiceClient _predictionServiceClient;
+    private readonly IPredictionServiceClient _predictionServiceClient;
 
     public QuoteGenerator(IOptions<QuoteGeneratorOptions> options, 
-        PredictionServiceClient predictionServiceClient)
+        IPredictionServiceClient predictionServiceClient)
     {
         _options = options.Value;
         
