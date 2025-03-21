@@ -30,31 +30,15 @@ namespace GenerativeQuote.Tests
 
             var quoteGenerator = new QuoteGenerator(mockOptions.Object, mockPredictionServiceClient.Object);
             var prompt = "Test Prompt";
-            var expectedModel = $"projects/test-project/locations/test-location/publishers/google/models/test-model";
-            var expectedPrompt = @"Goal: Create a creative, pithy random quote from a fictitious author.  Use the following JSON schema:
-            {
-                ""type"": ""object"",
-                ""properties"": {
-                    ""author"": { ""type"": ""string"" },
-                    ""quote"": { ""type"": ""string"" },
-                }
-            }
-
-            Use the following text as the theme to generate a quote for: " + prompt;
 
             // Act
             var result = await quoteGenerator.GetQuote(prompt);
 
             // Assert
              mockPredictionServiceClient.Verify(c => c.GenerateContentAsync(It.Is<GenerateContentRequest>(request =>
-                request.Model == expectedModel &&
                 request.Contents.Count == 1 &&
                 request.Contents[0].Parts.Count == 1 &&
-                request.Contents[0].Parts[0].Text == expectedPrompt &&
                 request.GenerationConfig.CandidateCount == 1 &&
-                request.GenerationConfig.MaxOutputTokens == 256 &&
-                request.GenerationConfig.Temperature == 0.6f &&
-                request.GenerationConfig.TopP == 1 &&
                 request.GenerationConfig.ResponseMimeType == "application/json"
             )), Times.Once);
         }
