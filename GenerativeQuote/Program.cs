@@ -21,6 +21,7 @@ builder.Services.AddPredictionServiceClient(client => {
 });
 
 builder.Services.AddSingleton<QuoteGenerator>();
+builder.Services.AddScoped<IPredictionServiceClient, PredictionServiceClientWrapper>();
 
 if (builder.Environment.IsProduction())
 {
