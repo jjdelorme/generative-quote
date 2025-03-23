@@ -4,6 +4,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Xunit;
 
 namespace GenerativeQuote.Tests;
@@ -108,8 +109,8 @@ public class QuoteGeneratorTests
         var candidate = new Candidate()
         {
             Content = new Content() { Parts = { new Part() { Text = "some text" } } },
-            FinishReason = Candidate.Types.FinishReason.Timeout,
-            FinishMessage = "Timeout"
+            FinishReason = Candidate.Types.FinishReason.Safety,
+            FinishMessage = "Safety"
         };
 
         mockPredictionServiceClient.Setup(x => x.GenerateContentAsync(It.IsAny<GenerateContentRequest>()))
