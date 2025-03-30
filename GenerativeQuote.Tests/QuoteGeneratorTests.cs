@@ -1,55 +1,64 @@
-using System.Text.Json;
+using GenerativeQuote;
 using Google.Cloud.AIPlatform.V1;
 using Microsoft.Extensions.Options;
 using Moq;
+using System.Threading.Tasks;
 using Xunit;
 
-namespace GenerativeQuote.Tests;
-
-public class QuoteGeneratorTests
+namespace GenerativeQuote.Tests
 {
-    [Fact]
-    public async Task GetQuote_ReturnsQuote()
+    public class QuoteGeneratorTests
     {
-        // Arrange
-        var options = new QuoteGeneratorOptions
+        [Fact]
+        public async Task GetQuote_ValidPrompt_ReturnsQuote()
         {
-            ProjectId = "my-project",
-            LocationId = "us-central1",
-            ModelId = "text-bison-001"
-        };
-
-        var mockPredictionServiceClient = new Mock<PredictionServiceClient>();
-        mockPredictionServiceClient
-            .Setup(x => x.GenerateContentAsync(It.IsAny<GenerateContentRequest>(), null))
-            .ReturnsAsync(new GenerateContentResponse
+            // Arrange
+            var mockOptions = new Mock<IOptions<QuoteGeneratorOptions>>();
+            mockOptions.Setup(o => o.Value).Returns(new QuoteGeneratorOptions
             {
-                Candidates = { new Candidate { Content = new Content { Parts = { new Part { Text = "{\"quote\":\"Hello, world!\",\"author\":\"John Doe\"}" } } } } }
+                ProjectId = "test-project",
+                ModelId = "test-model",
+                LocationId = "test-location"
             });
 
-        var quoteGenerator = new QuoteGenerator(Options.Create(options), mockPredictionServiceClient.Object);
+            var mockPredictionServiceClient = new Mock<IPredictionServiceClient>();
+            mockPredictionServiceClient.Setup(c => c.GenerateContentAsync(It.IsAny<GenerateContentRequest>()))
+                .ReturnsAsync(new GenerateContentResponse
+                {
+                    Candidates = { new Candidate { Content = new Content { Parts = { new Part { Text = "{\"author\": \"Test Author\", \"quote\": \"Test Quote\"}" } } } } }
+                });
 
-        // Act
-        var quote = await quoteGenerator.GetQuote("Hello, world!");
+            var quoteGenerator = new QuoteGenerator(mockOptions.Object, mockPredictionServiceClient.Object);
+            var prompt = "Test Prompt";
 
-        // Assert
-        Assert.Equal("Hello, world!", quote.Quote);
-        Assert.Equal("John Doe", quote.Author);
-    }
+            // Act
+            var result = await quoteGenerator.GetQuote(prompt);
 
-    [Fact]
-    public void GetQuote_ThrowsException_WhenProjectIdMissing()
-    {
-        // Arrange
-        var options = new QuoteGeneratorOptions
+            // Assert
+             mockPredictionServiceClient.Verify(c => c.GenerateContentAsync(It.Is<GenerateContentRequest>(request =>
+                request.Contents.Count == 1 &&
+                request.Contents[0].Parts.Count == 1 &&
+                request.GenerationConfig.CandidateCount == 1 &&
+                request.GenerationConfig.ResponseMimeType == "application/json"
+            )), Times.Once);
+        }
+
+        [Fact]
+        public void Constructor_MissingProjectId_ThrowsException()
         {
-            LocationId = "us-central1",
-            ModelId = "text-bison-001"
-        };
+            // Arrange
+            var mockOptions = new Mock<IOptions<QuoteGeneratorOptions>>();
+            mockOptions.Setup(o => o.Value).Returns(new QuoteGeneratorOptions
+            {
+                ProjectId = "", // Missing ProjectId
+                ModelId = "test-model",
+                LocationId = "test-location"
+            });
 
-        var mockPredictionServiceClient = new Mock<PredictionServiceClient>();
+            var mockPredictionServiceClient = new Mock<IPredictionServiceClient>();
 
-        // Act and Assert
-        Assert.Throws<Exception>(() => new QuoteGenerator(Options.Create(options), mockPredictionServiceClient.Object));
+            // Act & Assert
+            Assert.Throws<System.Exception>(() => new QuoteGenerator(mockOptions.Object, mockPredictionServiceClient.Object));
+        }
     }
 }
