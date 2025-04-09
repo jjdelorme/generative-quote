@@ -13,9 +13,9 @@ public class QuoteGenerator
     /// <summary>
     /// Goal instructions for the LLM.
     /// </summary>
-    public static string PromptGoal = "Create a creative, pithy random quote from a fictitious author";
+    private const string PromptGoal = "Create a creative, pithy random quote from a fictitious author";
 
-    public static readonly GenerationConfig GenerationConfig = new() 
+    private static readonly GenerationConfig GenerationConfig = new() 
     { 
         CandidateCount = 1, 
         MaxOutputTokens = 256, 
