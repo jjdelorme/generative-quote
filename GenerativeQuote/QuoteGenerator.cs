@@ -10,22 +10,8 @@ public class QuoteGenerator
     private readonly string _model;
     private readonly IPredictionServiceClient _predictionServiceClient;
 
-    /// <summary>
-    /// Goal instructions for the LLM.
-    /// </summary>
-    private const string PromptGoal = "Create a creative, pithy random quote from a fictitious author";
 
-    private static readonly GenerationConfig GenerationConfig = new() 
-    { 
-        CandidateCount = 1, 
-        MaxOutputTokens = 256, 
-        Temperature = 0.6f, 
-        TopP = 1,
-        ResponseMimeType = "application/json"
-    };
-
-
-    public QuoteGenerator(IOptions<QuoteGeneratorOptions> options, 
+    public QuoteGenerator(IOptions<QuoteGeneratorOptions> options,
         IPredictionServiceClient predictionServiceClient)
     {
         _options = options.Value;
@@ -44,6 +30,8 @@ public class QuoteGenerator
     /// <example>"Generate a random quote from a fictional person."</example>
     public async Task<QuoteModel> GetQuote(string theme)
     {
+        const string PromptGoal = "Create a creative, pithy random quote from a fictitious author";
+
         var prompt = $@"
             Goal: {PromptGoal}.  Use the following JSON schema for your response: {QuoteModel.Schema}
             Use the following text as the theme to generate a quote for: {theme}
@@ -67,10 +55,19 @@ public class QuoteGenerator
         var content = new Content() { Role = "USER" };
         content.Parts.Add(new Part() { Text = textPrompt });
 
+        var generationConfig = new GenerationConfig
+        {
+            CandidateCount = _options.GenerationConfig.CandidateCount,
+            MaxOutputTokens = _options.GenerationConfig.MaxOutputTokens,
+            Temperature = _options.GenerationConfig.Temperature,
+            TopP = _options.GenerationConfig.TopP,
+            ResponseMimeType = "application/json" 
+        };
+
         var request = new GenerateContentRequest
         {
             Contents = { content, },
-            GenerationConfig = GenerationConfig,
+            GenerationConfig = generationConfig,
             Model = _model,
         };
 
